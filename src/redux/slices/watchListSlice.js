@@ -1,12 +1,19 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const watchListSlice = createSlice({
+const watchlistSlice = createSlice({
   name: 'watchlist',
   initialState: [],
   reducers: {
-    setWatchlist: (state, action) => action.payload,
+    setWatchlist: (state, action) => {
+      return action.payload;
+    },
     addToWatchlist: (state, action) => {
-      state.push(action.payload);
+      const index = state.findIndex(coin => coin.id === action.payload.id);
+      if (index !== -1) {
+        state[index] = { ...state[index], ...action.payload };
+      } else {
+        state.push(action.payload);
+      }
     },
     removeFromWatchlist: (state, action) => {
       return state.filter(coin => coin.id !== action.payload);
@@ -17,5 +24,5 @@ const watchListSlice = createSlice({
   },
 });
 
-export const { setWatchlist, addToWatchlist, removeFromWatchlist, clearWatchlist } = watchListSlice.actions;
-export default watchListSlice.reducer;
+export const { setWatchlist, addToWatchlist, removeFromWatchlist, clearWatchlist } = watchlistSlice.actions;
+export default watchlistSlice.reducer;

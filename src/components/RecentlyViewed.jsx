@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCoinDetails, initializeRecentlyViewed } from '@/redux/slices/coinsSlice';
+import { fetchCoinDetails, initializeRecentlyViewed, clearRecentlyViewed, removeFromRecentlyViewed } from '@/redux/slices/coinsSlice';
 
 const RecentlyViewed = () => {
   const dispatch = useDispatch();
@@ -24,16 +24,24 @@ const RecentlyViewed = () => {
     });
   }, [recentlyViewed, dispatch, coinDetails]);
 
+  const handleClearRecentlyViewed = () => {
+    dispatch(clearRecentlyViewed());
+  };
+
+  const handleRemoveFromRecentlyViewed = (coinId) => {
+    dispatch(removeFromRecentlyViewed(coinId));
+  };
+
   if (recentlyViewed.length === 0) {
-    return(
-      <div className={`p-3 text-center border-[2px] rounded-lg ${isDarkMode?"text-white border-gray-600 bg-gray-950":"text-black bg-gray-100 border-gray-400"}`}>
+    return (
+      <div className={`p-3 text-center border-[2px] rounded-lg ${isDarkMode ? "text-white border-gray-600 bg-gray-950" : "text-black bg-gray-100 border-gray-400"}`}>
         No recently viewed cryptocurrencies.
       </div>
     );
   }
   const displayedCoins = showAll ? recentlyViewed : recentlyViewed.slice(0, 5);
   return (
-    <div className={`theme-transition p-3 text-xs border-[2px] rounded-lg ${isDarkMode?"text-white border-gray-600 bg-gray-950":"text-black bg-gray-100 border-gray-400"}`}>
+    <div className={`theme-transition p-3 text-xs border-[2px] rounded-lg ${isDarkMode ? "text-white border-gray-600 bg-gray-950" : "text-black bg-gray-100 border-gray-400"}`}>
       <h2 className="text-xl font-bold mb-4 text-center md:text-left">Recently Viewed</h2>
       <div className="overflow-x-auto">
         <table className="w-full">
@@ -43,13 +51,14 @@ const RecentlyViewed = () => {
               <th className="py-2 px-3 text-right">Rank</th>
               <th className="py-2 px-3 text-right">Genesis Date</th>
               <th className="py-2 px-3 text-right">Current Price</th>
+              <th className="py-2 px-3 text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="text-gray-500 font-light">
             {displayedCoins.map((coin) => {
               const currentData = coinDetails[coin.id];
               return (
-                <tr key={coin.id} className={`${isDarkMode?"hover:bg-gray-900":"hover:bg-gray-200"} cursor-pointer`}>
+                <tr key={coin.id} className={`${isDarkMode ? "hover:bg-gray-900" : "hover:bg-gray-200"} cursor-pointer`}>
                   <td className="py-2 px-3 text-left whitespace-nowrap">
                     <Link href={`/coin/${coin.id}`} className="flex items-center group">
                       <img className="w-6 h-6 rounded-full mr-2" src={coin.image} alt={coin.name} />
@@ -67,19 +76,35 @@ const RecentlyViewed = () => {
                   <td className="py-2 px-3 text-right">
                     {currentData ? `$${currentData.market_data.current_price.usd.toLocaleString()}` : 'Loading...'}
                   </td>
+                  <td className="py-2 px-3 text-right">
+                    <button
+                      onClick={() => handleRemoveFromRecentlyViewed(coin.id)}
+                      className={`py-1 px-2 rounded ${isDarkMode ? "bg-red-600 text-white" : "bg-red-200 text-red-800"}`}
+                    >
+                      Remove
+                    </button>
+                  </td>
                 </tr>
               );
             })}
           </tbody>
         </table>
-        {displayedCoins.length > 5 && (
-          <div
-            onClick={() => setShowAll(!showAll)}
-            className={`w-full text-center mt-2 font-bold py-1.5 px-2 rounded text-xs cursor-pointer ${isDarkMode?"text-white bg-gray-900":"text-black bg-gray-200"}`}
-          >
-            {showAll ? 'Show Less' : 'View More'}
+      </div>
+      {recentlyViewed.length > 5 && (
+        <div
+          onClick={() => setShowAll(!showAll)}
+          className={`w-full text-center mt-2 font-bold py-1.5 px-2 rounded text-xs cursor-pointer ${isDarkMode ? "text-white bg-gray-900" : "text-black bg-gray-200"}`}
+        >
+          {showAll ? 'Show Less' : 'View More'}
         </div>
       )}
+      <div className="w-full text-center mt-2">
+        <button
+          onClick={handleClearRecentlyViewed}
+          className={`py-1.5 px-4 rounded font-bold ${isDarkMode ? "bg-red-600 text-white" : "bg-red-200 text-red-800"}`}
+        >
+          Clear Recently Viewed
+        </button>
       </div>
     </div>
   );

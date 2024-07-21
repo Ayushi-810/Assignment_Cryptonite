@@ -68,7 +68,20 @@ const coinsSlice = createSlice({
     trendingStatus: 'idle',
     trendingError: null,
   },
-  reducers: {},
+  reducers: {
+    clearRecentlyViewed: (state) => {
+      state.recentlyViewed = [];
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('recentlyViewed', JSON.stringify([]));
+      }
+    },
+    removeFromRecentlyViewed: (state, action) => {
+      state.recentlyViewed = state.recentlyViewed.filter(coin => coin.id !== action.payload);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('recentlyViewed', JSON.stringify(state.recentlyViewed));
+      }
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchCoins.pending, (state) => {
@@ -113,4 +126,6 @@ const coinsSlice = createSlice({
   }
 })
 
-export default coinsSlice.reducer
+export const { clearRecentlyViewed, removeFromRecentlyViewed } = coinsSlice.actions;
+
+export default coinsSlice.reducer;

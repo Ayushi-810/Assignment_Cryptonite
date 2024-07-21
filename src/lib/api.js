@@ -2,7 +2,7 @@ import axios from 'axios';
 import { apiLimiter } from '@/utils/rateLimiter';
 import { getCachedData, setCachedData } from './cache';
 
-const API_KEY = 'CG-byTzA9vQnMTod9y15ee11Lg3';
+const API_KEY = process.env._API_KEY;
 const BASE_URL = 'https://api.coingecko.com/api/v3';
 
 const api = axios.create({

@@ -1,40 +1,29 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { fetchWithCache } from '@/lib/api';
 
-const API_URL = 'https://api.coingecko.com/api/v3';
-
-export const fetchHistoricalData = createAsyncThunk('historicalData/fetchHistoricalData', async (_, { rejectWithValue }) => {
-  try {
-    const coins = ['bitcoin', 'ethereum', 'binancecoin'];
-    const days = '30'; 
-    const promises = coins.map((coin) =>
-      axios.get(`${API_URL}/coins/${coin}/market_chart`, 
-        {
-          params: {
-            vs_currency: 'usd',
-            days: days,
-            api_key: 'CG-byTzA9vQnMTod9y15ee11Lg3',
-          },
+export const fetchHistoricalData = createAsyncThunk(
+  'historicalData/fetchHistoricalData',
+  async ({ coins, days }, { rejectWithValue }) => {
+    try {
+      const promises = coins.map((coin) =>
+        fetchWithCache(`coins/${coin}/market_chart`, {
+          vs_currency: 'usd',
+          days: days,
         })
-    );
+      );
 
-    const responses = await Promise.all(promises);
-    const data = responses.map((response, index) => ({
-      name: coins[index],
-      prices: response.data.prices,
-    }));
+      const responses = await Promise.all(promises);
+      const data = responses.map((response, index) => ({
+        name: coins[index],
+        prices: response.prices,
+      }));
 
-    console.log('Fetched Data:', data); // Debug log
-
-    return data;
-  } catch (error) {
-    console.error('Error fetching data:', error); // Debug log
-    if (!error.response) {
-      throw error;
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
     }
-    return rejectWithValue(error.response.data);
   }
-});
+);
 
 const historicalDataSlice = createSlice({
   name: 'historicalData',
@@ -43,7 +32,13 @@ const historicalDataSlice = createSlice({
     status: 'idle',
     error: null,
   },
-  reducers: {},
+  reducers: {
+    resetHistoricalData: (state) => {
+      state.data = [];
+      state.status = 'idle';
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchHistoricalData.pending, (state) => {
@@ -55,9 +50,9 @@ const historicalDataSlice = createSlice({
       })
       .addCase(fetchHistoricalData.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload || action.error.message;
+        state.error = action.payload;
       });
   },
 });
-
+export const { resetHistoricalData } = historicalDataSlice.actions;
 export default historicalDataSlice.reducer;

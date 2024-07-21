@@ -7,6 +7,7 @@ import { fetchGlobalMarketCap, fetchPublicCompaniesHoldings } from '@/redux/slic
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { setTheme } from '@/redux/slices/themeSlice';
+import { fetchHistoricalData, resetHistoricalData } from '@/redux/slices/historicalDataSlice';
 
 const HomeContent = () => {
 
@@ -23,15 +24,17 @@ const HomeContent = () => {
       }
     }, [dispatch,dm]);
     const { publicCompaniesHoldings } = useSelector(state => state.home);
-  
+    
     useEffect(() => {
+      dispatch(resetHistoricalData());
+      dispatch(fetchHistoricalData({ coins: ['bitcoin', 'ethereum', 'binancecoin'], days: '30' }));
       dispatch(fetchGlobalMarketCap());
       dispatch(fetchPublicCompaniesHoldings());
     }, [dispatch]);
 
     return (
         <div className='w-full flex flex-col gap-5 md:pb-5'>
-            <div className={`theme-transition flex items-center border-[2px] rounded-lg ${isDarkMode?"bg-gray-950 border-gray-600 text-white":"bg-gray-100 border-gray-400 text-black"} p-3`}>
+            <div className={`theme-transition flex items-center border-[2px] rounded-lg ${isDarkMode?"bg-gray-950 border-gray-600 text-white":"bg-gray-100 border-gray-400 text-black"} p-2 md:p-3`}>
                 <LineChart/>
             </div>
             <TrendingMarket/>
