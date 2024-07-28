@@ -24,11 +24,9 @@ export const fetchPublicCompaniesHoldings = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const mockData = [
-        { name: 'MicroStrategy', bitcoin: 129218, ethereum: 0 },
-        { name: 'Tesla', bitcoin: 43200, ethereum: 0 },
-        { name: 'Galaxy Digital', bitcoin: 16400, ethereum: 140000 },
-        { name: 'Square Inc.', bitcoin: 8027, ethereum: 0 },
-        { name: 'Marathon Digital', bitcoin: 4813, ethereum: 0 },
+        { name: 'Million Token', bitcoin: 100000, ethereum: 2000000 },
+        { name: 'Polygon', bitcoin: 100, ethereum: 200 },
+        { name: 'Solana', bitcoin: 120, ethereum: 240 },
       ];
       await new Promise(resolve => setTimeout(resolve, 1000));
       
